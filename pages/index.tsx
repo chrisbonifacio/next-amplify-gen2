@@ -1,11 +1,39 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
+"use client";
 
-const inter = Inter({ subsets: ['latin'] })
+import Head from "next/head";
+import Image from "next/image";
+import { Inter } from "next/font/google";
+import styles from "@/styles/Home.module.css";
+
+import { generateClient } from "aws-amplify/data";
+import { type Schema } from "@/amplify/data/resource";
+import { useEffect, useState } from "react";
+import { useAuthenticator } from "@aws-amplify/ui-react";
+
+const client = generateClient<Schema>(); // use this Data client for CRUDL requests
+
+const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
+  const { username, signOut } = useAuthenticator();
+  const [todos, setTodos] = useState<Schema["Todo"][]>([]);
+
+  async function listTodos() {
+    // fetch all todos
+    const { data } = await client.models.Todo.list({ authMode: "apiKey" });
+    setTodos(data);
+  }
+
+  useEffect(() => {
+    listTodos();
+
+    const sub = client.models.Todo.observeQuery().subscribe(({ items }) =>
+      setTodos([...items])
+    );
+
+    return () => sub.unsubscribe();
+  }, []);
+
   return (
     <>
       <Head>
@@ -15,100 +43,42 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={`${styles.main} ${inter.className}`}>
-        <div className={styles.description}>
-          <p>
-            Get started by editing&nbsp;
-            <code className={styles.code}>pages/index.tsx</code>
-          </p>
-          <div>
-            <a
-              href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              By{' '}
-              <Image
-                src="/vercel.svg"
-                alt="Vercel Logo"
-                className={styles.vercelLogo}
-                width={100}
-                height={24}
-                priority
-              />
-            </a>
-          </div>
+        <div>
+          <button onClick={signOut}>Sign Out</button>
+          <p>Welcome, {username}!</p>
+          <h1>Amplify Gen2</h1>
+          <button
+            style={{ marginTop: "1em", padding: ".5em 1em" }}
+            onClick={async () => {
+              await client.models.Todo.create({
+                content: window.prompt("Enter title:"),
+                priority: "medium",
+              });
+            }}
+          >
+            Create Todo
+          </button>
         </div>
+        <div>
+          <h2>Todos</h2>
 
-        <div className={styles.center}>
-          <Image
-            className={styles.logo}
-            src="/next.svg"
-            alt="Next.js Logo"
-            width={180}
-            height={37}
-            priority
-          />
-        </div>
-
-        <div className={styles.grid}>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2>
-              Docs <span>-&gt;</span>
-            </h2>
-            <p>
-              Find in-depth information about Next.js features and&nbsp;API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2>
-              Learn <span>-&gt;</span>
-            </h2>
-            <p>
-              Learn about Next.js in an interactive course with&nbsp;quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2>
-              Templates <span>-&gt;</span>
-            </h2>
-            <p>
-              Discover and deploy boilerplate example Next.js&nbsp;projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2>
-              Deploy <span>-&gt;</span>
-            </h2>
-            <p>
-              Instantly deploy your Next.js site to a shareable URL
-              with&nbsp;Vercel.
-            </p>
-          </a>
+          {todos.map((todo) => {
+            return (
+              <div key={todo.id} style={{ margin: "1em auto" }}>
+                {todo.content}
+                <button
+                  style={{ marginLeft: "1em" }}
+                  onClick={async () => {
+                    await client.models.Todo.delete({ id: todo.id });
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            );
+          })}
         </div>
       </main>
     </>
-  )
+  );
 }
