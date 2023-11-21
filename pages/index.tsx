@@ -18,13 +18,15 @@ const inter = Inter({ subsets: ["latin"] });
 function Home({ user, signOut }: WithAuthenticatorProps) {
   const [todos, setTodos] = useState<Schema["Todo"][]>([]);
 
-  const getUserGroup = async () => {
+  async function getUserGroup() {
     // get user group
     const user = await getCurrentUser();
     const session = await fetchAuthSession();
 
-    console.log(session);
-  };
+    const groups = session.tokens?.accessToken.payload["cognito:groups"];
+
+    console.log(groups);
+  }
 
   async function listTodos() {
     // fetch all todos
@@ -33,6 +35,7 @@ function Home({ user, signOut }: WithAuthenticatorProps) {
   }
 
   useEffect(() => {
+    getUserGroup();
     listTodos();
 
     const sub = client.models.Todo.observeQuery().subscribe(({ items }) =>
