@@ -9,6 +9,11 @@ import { generateClient } from "aws-amplify/data";
 import { type Schema } from "@/amplify/data/resource";
 import { useEffect, useState } from "react";
 import { useAuthenticator } from "@aws-amplify/ui-react";
+import {
+  getCurrentUser,
+  fetchUserAttributes,
+  fetchAuthSession,
+} from "aws-amplify/auth";
 
 const client = generateClient<Schema>(); // use this Data client for CRUDL requests
 
@@ -17,6 +22,14 @@ const inter = Inter({ subsets: ["latin"] });
 export default function Home() {
   const { username, signOut } = useAuthenticator();
   const [todos, setTodos] = useState<Schema["Todo"][]>([]);
+
+  const getUserGroup = async () => {
+    // get user group
+    const user = await getCurrentUser();
+    const session = await fetchAuthSession();
+
+    console.log(session);
+  };
 
   async function listTodos() {
     // fetch all todos
