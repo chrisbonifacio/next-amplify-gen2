@@ -1,26 +1,21 @@
 "use client";
 
 import Head from "next/head";
-import Image from "next/image";
 import { Inter } from "next/font/google";
 import styles from "@/styles/Home.module.css";
 
 import { generateClient } from "aws-amplify/data";
-import { type Schema } from "@/amplify/data/resource";
+import type { Schema } from "@/amplify/data/resource";
 import { useEffect, useState } from "react";
-import { useAuthenticator } from "@aws-amplify/ui-react";
-import {
-  getCurrentUser,
-  fetchUserAttributes,
-  fetchAuthSession,
-} from "aws-amplify/auth";
+import { withAuthenticator } from "@aws-amplify/ui-react";
+import type { WithAuthenticatorProps } from "@aws-amplify/ui-react";
+import { getCurrentUser, fetchAuthSession } from "aws-amplify/auth";
 
 const client = generateClient<Schema>(); // use this Data client for CRUDL requests
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
-  const { username, signOut } = useAuthenticator();
+function Home({ user, signOut }: WithAuthenticatorProps) {
   const [todos, setTodos] = useState<Schema["Todo"][]>([]);
 
   const getUserGroup = async () => {
@@ -58,7 +53,7 @@ export default function Home() {
       <main className={`${styles.main} ${inter.className}`}>
         <div>
           <button onClick={signOut}>Sign Out</button>
-          <p>Welcome, {username}!</p>
+          <p>Welcome, {user?.username}!</p>
           <h1>Amplify Gen2</h1>
           <button
             style={{ marginTop: "1em", padding: ".5em 1em" }}
@@ -95,3 +90,5 @@ export default function Home() {
     </>
   );
 }
+
+export default withAuthenticator(Home);

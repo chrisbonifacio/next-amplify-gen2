@@ -1,5 +1,4 @@
 // pages/_app.tsx
-import { withAuthenticator } from "@aws-amplify/ui-react";
 import { Amplify } from "aws-amplify";
 import config from "@/amplifyconfiguration.json";
 import "@aws-amplify/ui-react/styles.css";
@@ -12,4 +11,4 @@ function App({ Component, pageProps }: AppProps) {
   return <Component {...pageProps} />;
 }
 
-export default withAuthenticator(App);
+export default App;
