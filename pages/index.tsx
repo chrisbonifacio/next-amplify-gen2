@@ -4,47 +4,13 @@ import Head from "next/head";
 import { Inter } from "next/font/google";
 import styles from "@/styles/Home.module.css";
 
-import { generateClient } from "aws-amplify/data";
-import type { Schema } from "@/amplify/data/resource";
-import { useEffect, useState } from "react";
 import { withAuthenticator } from "@aws-amplify/ui-react";
 import type { WithAuthenticatorProps } from "@aws-amplify/ui-react";
-import { getCurrentUser, fetchAuthSession } from "aws-amplify/auth";
-
-const client = generateClient<Schema>(); // use this Data client for CRUDL requests
+import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
 
 function Home({ user, signOut }: WithAuthenticatorProps) {
-  const [todos, setTodos] = useState<Schema["Todo"][]>([]);
-
-  async function getUserGroup() {
-    // get user group
-    const user = await getCurrentUser();
-    const session = await fetchAuthSession();
-
-    const groups = session.tokens?.accessToken.payload["cognito:groups"];
-
-    console.log(groups);
-  }
-
-  async function listTodos() {
-    // fetch all todos
-    const { data } = await client.models.Todo.list({ authMode: "apiKey" });
-    setTodos(data);
-  }
-
-  useEffect(() => {
-    getUserGroup();
-    listTodos();
-
-    const sub = client.models.Todo.observeQuery().subscribe(({ items }) =>
-      setTodos([...items])
-    );
-
-    return () => sub.unsubscribe();
-  }, []);
-
   return (
     <>
       <Head>
@@ -58,37 +24,9 @@ function Home({ user, signOut }: WithAuthenticatorProps) {
           <button onClick={signOut}>Sign Out</button>
           <p>Welcome, {user?.username}!</p>
           <h1>Amplify Gen2</h1>
-          <button
-            style={{ marginTop: "1em", padding: ".5em 1em" }}
-            onClick={async () => {
-              await client.models.Todo.create({
-                content: window.prompt("Enter title:"),
-                priority: "medium",
-              });
-            }}
-          >
-            Create Todo
-          </button>
         </div>
-        <div>
-          <h2>Todos</h2>
 
-          {todos.map((todo) => {
-            return (
-              <div key={todo.id} style={{ margin: "1em auto" }}>
-                {todo.content}
-                <button
-                  style={{ marginLeft: "1em" }}
-                  onClick={async () => {
-                    await client.models.Todo.delete({ id: todo.id });
-                  }}
-                >
-                  Delete
-                </button>
-              </div>
-            );
-          })}
-        </div>
+        <Link href={"/blogs"}>Blogs</Link>
       </main>
     </>
   );
