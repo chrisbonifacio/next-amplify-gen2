@@ -1,0 +1,102 @@
+{
+  "aws_project_region": "us-east-1",
+  "aws_user_pools_id": "us-east-1_eGTREZq0F",
+  "aws_cognito_region": "us-east-1",
+  "aws_user_pools_web_client_id": "15mvr7ln62479iu4agl6la6ekr",
+  "aws_cognito_identity_pool_id": "us-east-1:4fb03883-ace3-4203-a4d2-af60bec49bc6",
+  "allowUnauthenticatedIdentities": "true",
+  "aws_cognito_signup_attributes": [
+    "EMAIL"
+  ],
+  "aws_cognito_username_attributes": [
+    "EMAIL"
+  ],
+  "aws_cognito_verification_mechanisms": [
+    "EMAIL"
+  ],
+  "aws_cognito_password_protection_settings": {
+    "passwordPolicyMinLength": 8,
+    "passwordPolicyCharacters": [
+      "REQUIRES_NUMBERS",
+      "REQUIRES_LOWERCASE",
+      "REQUIRES_UPPERCASE",
+      "REQUIRES_SYMBOLS"
+    ]
+  },
+  "aws_appsync_authenticationType": "API_KEY",
+  "aws_appsync_region": "us-east-1",
+  "aws_appsync_graphqlEndpoint": "https://jo7kv7ngubgq7f4vs5mm64ozia.appsync-api.us-east-1.amazonaws.com/graphql",
+  "modelIntrospection": {
+    "version": 1,
+    "models": {
+      "Todo": {
+        "name": "Todo",
+        "fields": {
+          "id": {
+            "name": "id",
+            "isArray": false,
+            "type": "ID",
+            "isRequired": true,
+            "attributes": []
+          },
+          "content": {
+            "name": "content",
+            "isArray": false,
+            "type": "String",
+            "isRequired": false,
+            "attributes": []
+          },
+          "createdAt": {
+            "name": "createdAt",
+            "isArray": false,
+            "type": "AWSDateTime",
+            "isRequired": false,
+            "attributes": [],
+            "isReadOnly": true
+          },
+          "updatedAt": {
+            "name": "updatedAt",
+            "isArray": false,
+            "type": "AWSDateTime",
+            "isRequired": false,
+            "attributes": [],
+            "isReadOnly": true
+          }
+        },
+        "syncable": true,
+        "pluralName": "Todos",
+        "attributes": [
+          {
+            "type": "model",
+            "properties": {}
+          },
+          {
+            "type": "auth",
+            "properties": {
+              "rules": [
+                {
+                  "allow": "public",
+                  "operations": [
+                    "create",
+                    "update",
+                    "delete",
+                    "read"
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "primaryKeyInfo": {
+          "isCustomPrimaryKey": false,
+          "primaryKeyFieldName": "id",
+          "sortKeyFieldNames": []
+        }
+      }
+    },
+    "enums": {},
+    "nonModels": {}
+  },
+  "aws_appsync_apiKey": "da2-o6r5t4mygzh6likw3y4ktv5hry",
+  "aws_appsync_additionalAuthenticationTypes": "AMAZON_COGNITO_USER_POOLS,AWS_IAM"
+}
